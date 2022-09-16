@@ -12,9 +12,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 @Component
 public class RabbitMqConsumer {
+    private static final Logger logger = Logger.getLogger(SocketController.class.getName());
     private final Gson gson = new Gson();
     private final SocketController controller;
 
@@ -27,12 +29,14 @@ public class RabbitMqConsumer {
 
     @RabbitListener(queues = PROXY_QUEUE_POST_CREATED)
     public void listenToPostCratedQueue(String message) throws ClassNotFoundException {
+        logger.info("Message received: " + message);
         PostModel post = gson.fromJson(message, PostModel.class);
         controller.sendPostCreated("mainSpace", post);
     }
 
     @RabbitListener(queues = PROXY_QUEUE_COMMENT_ADDED)
     public void listenToCommentAddedQueue(String message) throws ClassNotFoundException {
+        logger.info("Message received: " + message + "from comment added");
         CommentModel comment = gson.fromJson(message, CommentModel.class);
         controller.sendCommentAdded(comment.getPostId(), comment);
     }
